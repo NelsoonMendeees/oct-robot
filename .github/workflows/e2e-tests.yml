@@ -1,6 +1,11 @@
 name: E2E Tests
 on:
   workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Escolha o browser para os testes E2E (chromium, firefox, webkit)'
+        required: false
+        default: 'chromium'
 
 jobs:
   test:
@@ -42,11 +47,11 @@ jobs:
       run: npx wait-on http://localhost:3000 --timeout=60000
 
     - name: Run E2E Tests
-      run: robot -d ./logs robot/tests/
+      run: robot -d ./logs -v BROWSER:${{ github.event.inputs.browser }} robot/tests/
 
     - name: Upload Test Results
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: robot-results-chrome
+        name: robot-results-${{ github.event.inputs.browser }}
         path: logs/
